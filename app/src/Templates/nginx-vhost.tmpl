@@ -1,0 +1,16 @@
+server {
+    root ${tmpl_website_path};
+    index index.html index.htm index.php;
+    server_name ${tmpl_domains};
+
+    location / {
+        try_files \$uri \$uri/ =404;
+    }
+
+    location ~ \.php$ {
+        fastcgi_param PHP_VALUE open_basedir=/var/www/${tmpl_username};
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass    ${tmpl_fastcgi_host}:${tmpl_fastcgi_port};
+    }
+}

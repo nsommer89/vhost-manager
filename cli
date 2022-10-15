@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+
+# Default CLI container name
+CONTAINER_NAME=$1
+if [ -z "$CONTAINER_NAME" ]; then
+  CONTAINER_NAME="webhost"
+fi
+
+# Optional entrypoint command
+COMMAND=$2
+if [ -z "$COMMAND" ]; then
+    COMMAND=bash
+fi
+
+docker exec -it $CONTAINER_NAME $COMMAND

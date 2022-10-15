@@ -1,0 +1,64 @@
+version: "3.7"
+services:
+  webhost:
+    depends_on:
+      - mariadb
+    env_file:
+      - ./app/.env
+    container_name: webhost
+    build:
+      context: .
+      dockerfile: ./docker/Ubuntu.22.04.Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/opt/vhost-manager
+      - ./data:/data
+      - ./data/home:/home
+      - ./data/www:/var/www
+    restart: always
+    links:
+      - mariadb
+    networks:
+      - webhost-network
+  mariadb:
+    image: mariadb:10.5
+    env_file:
+      - ./app/.env
+    container_name: mariadb
+    restart: always
+    environment:
+      - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${MYSQL_DATABASE}
+      - MARIADB_USER=${MYSQL_USER}
+      - MARIADB_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - ./data/mysql-data:/var/lib/mysql
+    ports:
+      - 3306:3306
+    networks:
+      - webhost-network
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    links:
+      - mariadb
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: always
+    ports:
+      - 8081:80
+    networks:
+      - webhost-network
+    depends_on:
+      - mariadb
+volumes:
+  data:
+  mysql-data:
+
+networks:
+  webhost-network:
+    driver: bridge

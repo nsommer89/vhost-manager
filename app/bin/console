@@ -1,0 +1,66 @@
+#!/usr/bin/env php8.1
+<?php
+require __DIR__.'/../bootstrap.php';
+
+use Symfony\Component\Finder\Finder;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use App\Command;
+
+$finder = new Finder();
+$finder->files()->in(__DIR__.'/../src/*')->name('*.php');
+
+$application = new Application('Vhost Manager', getenv('VHOST_MANAGER_VERSION'));
+
+$translator = new Translator(getenv('LOCALE'));
+$translator->addLoader('array', new ArrayLoader());
+
+if ($dh = opendir(__DIR__.'/../src/Translation')) {
+    while (($file = readdir($dh)) !== false) {
+        $real_path = __DIR__.'/../src/Translation/' . $file;
+        $path_info = pathinfo($real_path);
+        if (is_file($real_path) && file_exists($real_path)) {
+            if ($path_info['extension'] === 'json') {
+                $dict = (array) @json_decode(file_get_contents($real_path));
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new \Exception('Error parsing JSON file: ' . $real_path);
+                }
+                $translator->addResource('array', $dict, $path_info['filename']);
+            }
+        }
+    }
+    closedir($dh);
+}
+function __() {
+    global $translator;
+    $args = func_get_args();
+    $substitions = $args[1] ?? [];
+    $message = $translator->trans(array_shift($args));
+    if (count($substitions) && is_array($substitions)) {
+        foreach ($substitions as $key => $value) {
+            if (empty($key) || empty($value)) continue;
+            $message = str_replace(':'.$key, $value, $message);
+            $message = str_replace('{'.$key.'}', $value, $message);
+        }
+    }
+    return $message;
+}
+
+foreach ($finder as $file) {
+    if (!file_exists($file->getRealPath())) continue;
+    if (in_array(strtolower($file->getFileName()), ['index.php'])) continue;
+    $file_ns = str_replace('/', '\\', str_replace(__DIR__.'/../src/', '', $file->getPath()));
+    $class_name = "App\\" . $file_ns ."\\" . str_replace('.php', '', basename($file->getRealPath()));
+    require $file->getRealPath();
+    if ($file_ns == 'Command') {
+        $application->add(new $class_name());
+    }
+}
+
+if (!\App\Lib\SSHWrapper::isExecutingUserSudo()) {
+    die(__('You must execute this script as root. Sure you have sudo / root access?') . PHP_EOL);
+}
+
+$application->setDefaultCommand('start');
+$application->run();

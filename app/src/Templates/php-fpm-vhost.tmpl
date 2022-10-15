@@ -1,0 +1,22 @@
+[${tmpl_username}]
+
+; Unix user/group of processes
+; Note: The user is mandatory. If the group is not set, the default user's group
+;       will be used.
+user = ${tmpl_username}
+group = ${tmpl_username}
+
+listen = ${tmpl_fastcgi_host}:${tmpl_fastcgi_port}
+
+listen.owner = www-data
+listen.group = www-data
+
+; Note: This value is mandatory.
+pm = dynamic
+pm.max_children = 5
+pm.start_servers = 2
+
+pm.min_spare_servers = 1
+pm.max_spare_servers = 3
+
+chdir = ${tmpl_chdir}

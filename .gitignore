@@ -1,0 +1,7 @@
+mysql-data
+data
+app/vendor
+vendor
+app/scripts
+.env
+app/.env
