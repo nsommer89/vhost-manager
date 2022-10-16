@@ -1,6 +1,7 @@
 # vhost-manager for Ubuntu
 
-![Preview of vhost-manager](https://raw.githubusercontent.com/nsommer89/vhost-manager/master/screenshot.png)
+#### Demo/Screenshot
+<img src="https://raw.githubusercontent.com/nsommer89/vhost-manager/master/screenshot.png" width="350">
 
 #### ABOUT: vhost-manager is a tool for ubuntu servers to easily manage shared web hosting sites with nginx and php-fpm
 
@@ -30,8 +31,7 @@ Version history, see https://raw.githubusercontent.com/nsommer89/vhost-manager/m
 
 -----
 ## Todo
-1. ( ) Make certbot work (Actually just a test on a reachable FQDN to see it work)
-2. ( ) Users have to run as sudo
+No items currently
 
 ## Update version checklist:
 1. Update and render it in GenerateVersions.php
