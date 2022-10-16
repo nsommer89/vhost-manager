@@ -3,7 +3,6 @@
 namespace App\Lib;
 
 /**
- * @author  Nikolaj Sommer Jensen <nikolaj.jensen@gmail.com>
  * Class DatabaseConnection
  */
 class DatabaseConnection {

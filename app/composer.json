@@ -7,7 +7,6 @@
         "symfony/lock": "^6.1",
         "vlucas/phpdotenv": "^5.4",
         "symfony/translation": "^6.1",
-        "php-amqplib/php-amqplib": "^3.2",
         "symfony/http-client": "^6.1"
     },
     "autoload": {

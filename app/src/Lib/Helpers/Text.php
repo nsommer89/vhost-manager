@@ -3,7 +3,6 @@
 namespace App\Lib\Helpers;
 
 /**
- * @author  Nikolaj Sommer Jensen <nikolaj.jensen@gmail.com>
  * Class Text
  */
 class Text {

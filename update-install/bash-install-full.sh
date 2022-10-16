@@ -186,6 +186,9 @@ chmod -R 755 $VHOST_MANAGER_DIR
 # Make vhost-manager executable for vhost-admin group
 echo "vhost-admin     ALL = (root) NOPASSWD: /usr/local/bin/vhost" >> /etc/sudoers
 
+# Git add global safe directory
+git config --global --add safe.directory /opt/vhost-manager
+
 # Let users automatically run vhost-manager with sudo
 echo "alias vhost=\"sudo vhost\"" >> /etc/bash.bashrc
 

@@ -83,7 +83,7 @@ class CheckForUpdatesCommand extends Command
                 $output->writeln('<fg=yellow>Updating...</>');
 
                 // Update stuff
-                \exec('sh '.getenv('VHOST_MANAGER_DIR').'/update-install/bash-update.sh '.$result['stable'].' &> /dev/null', $updateResult, $updateExitCode);
+                \exec('sh '.getenv('VHOST_MANAGER_DIR').'/update-install/bash-update.sh '.$result['stable'].' '.getenv('VHOST_MANAGER_DIR').' &> /dev/null', $updateResult, $updateExitCode);
 
                 if ($updateExitCode !== 0) {
                     $output->writeln('<fg=red>Update failed!</>');

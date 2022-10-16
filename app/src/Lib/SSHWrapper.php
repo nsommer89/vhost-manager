@@ -3,18 +3,9 @@
 namespace App\Lib;
 
 /**
- * @author  Nikolaj Sommer Jensen <nikolaj.jensen@gmail.com>
  * Class SSHWrapper
  */
 class SSHWrapper {
-
-    /**
-     * SSHWrapper constructor.
-     */
-    private function __construct()
-    {
-    }
-
     /**
      * Returns a new instance of the SSHWrapper class.
      * 
@@ -226,9 +217,18 @@ class SSHWrapper {
      */
     public static function removeWwwDirectory(string $username) : bool
     {
+      // Checking if WWW_ROOT is set. It should not delete anything critical, but if it should contain a path
+      // to a critical directory, it should not delete it. Just for extra security measures.
+      if (empty(getenv('WWW_ROOT')) || in_array(getenv('WWW_ROOT'), ['/', '/var'])) {
+        throw new \Exception('WWW_ROOT is not set.');
+      }
+      if (empty($username)) {
+        // We should be good when we are checking the username, but just to be sure.
+        throw new \Exception('Username is required.');
+      }
       exec('rm -rf '.getenv('WWW_ROOT').'/'.$username, $output, $return); 
       if ($return !== 0) {
-        throw new \Exception(sprintf('Could not set permissions on %s/%s.', getenv('WWW_ROOT'), $username));
+        throw new \Exception(sprintf('Could not delete %s/%s.', getenv('WWW_ROOT'), $username));
       }
 
       return true;
