@@ -33,6 +33,10 @@ Remember when running the bash-install script to be sudo root, and also as menti
 4. Dump the contents from `update-install/dump.sql` to the database which name you can see in the .env file. You can find phpMyAdmin at http:/localhost:8018/
 5. Try it out with `./cli` or you can also do `./cli vhost <some-command> <some-argument>` 
 
+## Run in an already existing environment on Ubuntu >=20
+#### Stand-alone installation script is coming up soon
+
+## Test Domains / DNS
 #### To test it, you can add a DNS A record that points to 127.0.0.1, e.g. *.yourdomain.com and use this to create sites in the vhost-manager.
 #### Eventually, you can use *.dev.cloudtek.dk which points to 127.0.0.1
 -----
