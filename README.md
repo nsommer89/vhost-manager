@@ -14,17 +14,17 @@
 #### Have a fresh installation of one the following Ubuntu versions: 20.04, 22.04
 
 Remember when running the bash-install script to be sudo root, and also as mentioned use a fresh server!
-1. Update and install utillities: `apt-get update -y && apt-get install -y --no-install-recommends nano curl ca-certificates`
-2. Download vhost-manager installation script: `curl -O https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/bash-install-full.sh`
-3. Install it: `bash bash-install-full.sh`
+1. Update and install utillities:<br/>`apt-get update -y && apt-get install -y --no-install-recommends nano curl ca-certificates`
+2. Download vhost-manager installation script:<br/>`curl -O https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/bash-install-full.sh`
+3. Install it:<br/>`bash bash-install-full.sh`
 4. Try it out `vhost` or `vhost <some-command>`
 -----
 ## Run in a docker Ubuntu container (for testing purpose)
-
-1. Start a ubuntu docker container: `docker run -p 80:80 -p 443:443 -p 22:22 -a stdin -a stdout -i -t ubuntu:22.04 /bin/bash`
-2. When inside the container run `apt-get update -y && apt-get install -y --no-install-recommends nano curl ca-certificates`
-3. Download vhost-manager installation script: `curl -O https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/bash-install-full.sh`
-4. Install it: `bash bash-install-full.sh`
+1. Pull Docker Ubuntu 22.04:<br />`docker pull ubuntu:22.04`
+2. Start a ubuntu docker container:<br/>`docker run -p 80:80 -p 443:443 -p 22:22 -a stdin -a stdout -i -t ubuntu:22.04 /bin/bash`
+3. When inside the container run<br/>`apt-get update -y && apt-get install -y --no-install-recommends nano curl ca-certificates`
+4. Download vhost-manager installation script:<br/>`curl -O https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/bash-install-full.sh`
+5. Install it:<br/>`bash bash-install-full.sh`
 
 ## Run in Docker Compose
 1. Copy the env.dist file `cp app/.env.dist app/.env` and fill out the values
@@ -40,7 +40,7 @@ Remember when running the bash-install script to be sudo root, and also as menti
 #### To test it, you can add a DNS A record that points to 127.0.0.1, e.g. *.yourdomain.com and use this to create sites in the vhost-manager.
 #### Eventually, you can use *.dev.cloudtek.dk which points to 127.0.0.1
 -----
-Version history, see https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/versions.json
+#### Version history, see https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/versions.json
 -----
 ## Todo
 No items currently
