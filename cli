@@ -1,10 +1,8 @@
 #!/usr/bin/env sh
 
-# Default CLI container name
-CONTAINER_NAME=$1
-if [ -z "$CONTAINER_NAME" ]; then
-  CONTAINER_NAME="webhost"
-fi
+# This script is used to run the CLI tool when using the docker-compose setup.
+# The web container in docker-compose.yml is named "webhost".
+CONTAINER_NAME=webhost
 
 # Optional entrypoint command
 COMMAND=$2
@@ -12,4 +10,4 @@ if [ -z "$COMMAND" ]; then
     COMMAND=bash
 fi
 
-docker exec -it $CONTAINER_NAME $COMMAND
+docker exec -it $CONTAINER_NAME $COMMAND $3 $4 $5 $6 $7 $8 $9
