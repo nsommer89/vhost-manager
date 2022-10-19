@@ -1,0 +1,5 @@
+server {
+    root /var/www/example1;
+    index index.html;
+    listen 8000; 
+}

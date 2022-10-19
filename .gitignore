@@ -5,3 +5,4 @@ vendor
 app/scripts
 .env
 app/.env
+private_notes.md

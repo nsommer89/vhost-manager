@@ -317,6 +317,75 @@ class SSHWrapper {
     }
 
     /**
+     * Creates a nginx upstream config file and substituting the template variables.
+     * 
+     * @param string    $upstream_name
+     * @param string    $www_root
+     * @param array     $servers
+     * @return bool
+     * @throws \Exception
+     */
+    public static function createNginxUpstreamConfig(string $upstream_name, string $www_root, array $servers = null) : bool
+    {
+      $_TEMPLATE_PATH = getenv('APP_SYSTEM_PATH').'/src/Templates/upstream.tmpl';
+      $config_file_path = '/etc/nginx/sites-available/upstream_' . $upstream_name . '.conf';
+      $symlink_destination = '/etc/nginx/sites-enabled/upstream_' . $upstream_name . '.conf';
+
+      if (empty($servers)) {
+        throw new \Exception('No servers provided.');
+      }
+
+      $str_servers = '';
+      foreach ($servers as $server) {
+        if (empty($server['host']) || empty($server['port'])) {
+          throw new \Exception('Invalid server configuration.');
+        }
+        $str_servers .= "\t".'server '.$server['host'].':'.$server['port'].';' . PHP_EOL;
+      }
+
+      exec('upstream_name="'.$upstream_name.'" www_root="'.$www_root.'" servers="'.$str_servers.'" sh -c \'echo "\'"$(cat ' . $_TEMPLATE_PATH . ')"\'"\' > ' . $config_file_path, $output, $return); 
+      if ($return !== 0) {
+        throw new \Exception(sprintf('Could not create nginx upstream config: %s', $fpm_config_path));
+      }
+
+      exec('ln -s '.$config_file_path.' '.$symlink_destination, $output, $return); 
+      if ($return !== 0) {
+        throw new \Exception(sprintf('Could not create symlink for nginx config: %s.', $config_file_path));
+      }
+
+      return true;
+    }
+
+
+    /**
+     * Creates a nginx upstream child/node config file and substituting the template variables.
+     * 
+     * @param string    $host
+     * @param string    $port
+     * @param string    $www_root
+     * @return bool
+     * @throws \Exception
+     */
+    public static function createNginxUpstreamChildConfig(string $host, string $port, string $www_root) : bool
+    {
+      $_TEMPLATE_PATH = getenv('APP_SYSTEM_PATH').'/src/Templates/upstream_child.tmpl';
+      $config_file_path = '/etc/nginx/sites-available/node_' . $host . '.conf';
+      $symlink_destination = '/etc/nginx/sites-enabled/node_' . $host . '.conf';
+
+      exec('host="'.$host.'" port="'.$port.'" www_root="'.$www_root.'" sh -c \'echo "\'"$(cat ' . $_TEMPLATE_PATH . ')"\'"\' > ' . $config_file_path, $output, $return); 
+      if ($return !== 0) {
+        throw new \Exception(sprintf('Could not create nginx upstream config: %s', $fpm_config_path));
+      }
+
+      exec('ln -s '.$config_file_path.' '.$symlink_destination, $output, $return); 
+      if ($return !== 0) {
+        throw new \Exception(sprintf('Could not create symlink for nginx config: %s.', $config_file_path));
+      }
+
+      return true;
+    }
+
+    /**
      * Restarts the HTTP server.
      * 
      * @return bool
