@@ -27,61 +27,63 @@ VHOST_MANAGER_DIR=/opt/vhost-manager
 GIT_REPO_ADDR=https://github.com/nsommer89/vhost-manager.git
 VERSIONS_JSON_FILE_URL=https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/versions.json
 
-if [ "$1" = "default" ]; then
-  PHP_VERSION=8.1
+echo "Do you want to install vhost manager OS depdencies?"
+echo " - This option is helpful on a fresh install of Ubuntu 20.04|22.04 and will install all the dependencies needed for vhost manager to run."
+echo " - Will install the php version you want, nginx, mariadb, composer, git, nodejs, npm, yarn, certbot, fail2ban, ufw"
+echo " - PHP 8.1 and Git will be installed if not already installed, which is required for vhost manager to run."
+echo " - apt repository ppa:ondrej/php will be added if not already added."
+echo -n " - (y)/n: "
+read INSTALL_OS_DEPENDENCIES
+if [ "$INSTALL_OS_DEPENDENCIES" != "${INSTALL_OS_DEPENDENCIES#[Yy]}" ] ;then
+    INSTALL_OS_DEPENDENCIES=true
 else
+    INSTALL_OS_DEPENDENCIES=false
+fi
+
+if [ "$INSTALL_OS_DEPENDENCIES" = true ]; then
+  # If the user does not provide php version, then we will use the latest stable version
+  PHP_VERSION=8.1
   # Ask for PHP version
   echo "Available PHP versions: 7.4, 8.0, 8.1 (default), 8.2 or the version you want to install from ppa:ondrej/php"
   echo -n "What is the desired PHP version?: "
   read PHP_VERSION
-fi
 
-# Force the user to choose a PHP version
-if [ -z "$PHP_VERSION" ]; then
-  echo "Invalid PHP version. Aborting."
-  exit 1
-fi
+  # Force the user to choose a PHP version
+  if [ -z "$PHP_VERSION" ]; then
+    echo "Invalid PHP version. Aborting."
+    exit 1
+  fi
 
-if [ "$1" = "default" ]; then
-  CERTBOT_EMAIL=$2
-else
-  # Ask for certbot renewal email
-  echo -n "Enter the email address you want to receive certbot renewal warnings: "
-  read CERTBOT_EMAIL
-fi
+  if [ "$1" = "default" ]; then
+    CERTBOT_EMAIL=$2
+  else
+    # Ask for certbot renewal email
+    echo -n "Enter the email address you want to receive certbot renewal warnings: "
+    read CERTBOT_EMAIL
+  fi
 
-# Force the user to provide an email for certbot
-if [ -z "$CERTBOT_EMAIL" ]; then
-  echo "Invalid CERTBOT_EMAIL. Aborting."
-  exit 1
-fi
+  # Force the user to provide an email for certbot
+  if [ -z "$CERTBOT_EMAIL" ]; then
+    echo "Invalid CERTBOT_EMAIL. Aborting."
+    exit 1
+  fi
 
-if [ "$1" = "default" ]; then
-  MYSQL_ROOT_PASSWORD=$3
-else
   # Set mysql root password
   echo -n "Set MySQL root password: "
   read -r MYSQL_ROOT_PASSWORD
   echo
-fi
 
-# Check if MySQL root password is set properly
-if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
-  echo "Invalid MySQL root password. Aborting.";
-  exit 1;
-fi
+  # Check if MySQL root password is set properly
+  if [ -z "$MYSQL_ROOT_PASSWORD" ]; then
+    echo "Invalid MySQL root password. Aborting.";
+    exit 1;
+  fi
 
-if [ "$1" = "default" ]; then
   enableUFW=true;
-else
-# Ask if the user wants to enable the firewall and open ports 80 and 443
-echo "Do you want to install and enable UFW and open the ports 80 and 443? (y/n)? "
-read enableUFW
-fi
+  # Ask if the user wants to enable the firewall and open ports 80 and 443
+  echo "Do you want to install and enable UFW and open the ports 80 and 443? (y/n)? (default: yes) "
+  read enableUFW
 
-if [ "$1" = "default" ]; then
-  confirmInstall=true;
-else
   # Let the user confirm the installation
   echo "Are you sure this is correct? (y/n)? "
   echo " - PHP Version: $PHP_VERSION"
@@ -93,55 +95,69 @@ else
   fi
 
   read confirmInstall
+
+  if [ "$confirmInstall" != "${confirmInstall#[Nn]}" ] ;then
+      echo "Aborting installation";
+      exit 1
+  fi
 fi
 
-if [ "$confirmInstall" != "${confirmInstall#[Nn]}" ] ;then
-    echo "Aborting installation";
-    exit 1
-fi
+# Ensure the system is up to date wether we install OS dependencies or not
+apt-get update -y && apt-get install -y --no-install-recommends \
+  ca-certificates \
+  curl \
+  git \
+  nano \
+  tzdata
 
-# Install software-properties-common to be able to use add-apt-repository
-apt-get install software-properties-common -y
-apt-get update -y
+# Add ppa:ondrej/php repository
 add-apt-repository ppa:ondrej/php -y
 
-# Update system and install packages and desired php version
-apt-get update -y && apt-get install -y --no-install-recommends software-properties-common apt-transport-https ca-certificates git apt-utils curl wget mysql-client sudo nginx openssl nano vim php$PHP_VERSION php$PHP_VERSION-cli php$PHP_VERSION-fpm php$PHP_VERSION-zip php$PHP_VERSION-mysql php$PHP_VERSION-curl php$PHP_VERSION-gd php$PHP_VERSION-mbstring php$PHP_VERSION-xml php$PHP_VERSION-xmlrpc php$PHP_VERSION-intl php$PHP_VERSION-readline php$PHP_VERSION-bcmath php$PHP_VERSION-imagick php$PHP_VERSION-redis php$PHP_VERSION-sqlite3 php$PHP_VERSION-pgsql mysql-server mysql-client
+if [ "$INSTALL_OS_DEPENDENCIES" = true ]; then
+  # Install software-properties-common to be able to use add-apt-repository
+  apt-get install software-properties-common -y
+  apt-get update -y
 
-if [ "$enableUFW" != "${enableUFW#[Yy]}" ] ;then
-    apt-get install -y ufw
-    ufw allow 80
-    ufw allow 443
+  # Update system and install packages and desired php version
+  apt-get update -y && apt-get install -y --no-install-recommends software-properties-common apt-transport-https ca-certificates git apt-utils curl wget mysql-client sudo nginx openssl nano vim php$PHP_VERSION php$PHP_VERSION-cli php$PHP_VERSION-fpm php$PHP_VERSION-zip php$PHP_VERSION-mysql php$PHP_VERSION-curl php$PHP_VERSION-gd php$PHP_VERSION-mbstring php$PHP_VERSION-xml php$PHP_VERSION-xmlrpc php$PHP_VERSION-intl php$PHP_VERSION-readline php$PHP_VERSION-bcmath php$PHP_VERSION-imagick php$PHP_VERSION-redis php$PHP_VERSION-sqlite3 php$PHP_VERSION-pgsql mysql-server mysql-client
+
+  if [ "$enableUFW" != "${enableUFW#[Yy]}" ] ;then
+      apt-get install -y ufw
+      ufw allow 80
+      ufw allow 443
+  fi
+
+  # Install and configure certbot
+  apt install certbot python3-certbot-nginx -y
+  certbot register --non-interactive --agree-tos -m $CERTBOT_EMAIL
 fi
-
-# Install and configure certbot
-apt install certbot python3-certbot-nginx -y
-certbot register --non-interactive --agree-tos -m $CERTBOT_EMAIL
 
 # Install PHP8.1 which is used by vhost manager - if not already installed
 if [ ! -f /usr/bin/php8.1 ]; then
     apt-get install -y php8.1 php8.1-cli php8.1-fpm php8.1-zip php8.1-mysql php8.1-curl php8.1-gd php8.1-mbstring php8.1-xml php8.1-xmlrpc php8.1-intl php8.1-readline php8.1-bcmath php8.1-imagick php8.1-redis php8.1-sqlite3 php8.1-pgsql
 fi
 
-# Update ca-certificates
-update-ca-certificates
+if [ "$INSTALL_OS_DEPENDENCIES" = true ]; then
+  # Update ca-certificates
+  update-ca-certificates
 
-# Start MySQL and nginx
-service mysql start && service nginx start
+  # Start MySQL and nginx
+  service mysql start && service nginx start
 
-# Set the desired php version as default
-update-alternatives --set php /usr/bin/php$PHP_VERSION
-update-alternatives --set phar /usr/bin/phar$PHP_VERSION
-update-alternatives --set phar.phar /usr/bin/phar.phar$PHP_VERSION
+  # Set the desired php version as default
+  update-alternatives --set php /usr/bin/php$PHP_VERSION
+  update-alternatives --set phar /usr/bin/phar$PHP_VERSION
+  update-alternatives --set phar.phar /usr/bin/phar.phar$PHP_VERSION
 
-# Set MySQL root password
-mysql -u root <<-EOF
-UPDATE mysql.user SET Password=PASSWORD('$MYSQL_ROOT_PASSWORD') WHERE User='root';
-DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
-DELETE FROM mysql.user WHERE User='';
-DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
-FLUSH PRIVILEGES;
+  # Set MySQL root password
+  mysql -u root <<-EOF
+  UPDATE mysql.user SET Password=PASSWORD('$MYSQL_ROOT_PASSWORD') WHERE User='root';
+  DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
+  DELETE FROM mysql.user WHERE User='';
+  DELETE FROM mysql.db WHERE Db='test' OR Db='test_%';
+  FLUSH PRIVILEGES;
 EOF
+fi
 
 # We need to save password in a variable to use it to connect application to database
 VHOST_MYSQL_PASS=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c6)
@@ -167,8 +183,10 @@ mkdir -p $VHOST_MANAGER_DIR
 # Clone the repository 
 git clone $GIT_REPO_ADDR $VHOST_MANAGER_DIR && cd $VHOST_MANAGER_DIR && git checkout master && cd /
 
-# Setup vhost-manager SQL database structure
-mysql vhostmanager_db < $VHOST_MANAGER_DIR/update-install/dump.sql
+if [ "$INSTALL_OS_DEPENDENCIES" = true ]; then
+  # Setup vhost-manager SQL database structure
+  mysql vhostmanager_db < $VHOST_MANAGER_DIR/update-install/dump.sql
+fi
 
 # Run composer install with php8.1 in vhost-manager app directory
 cd $VHOST_MANAGER_DIR/app && /usr/bin/php8.1 /usr/local/bin/composer install && cd /
@@ -187,7 +205,7 @@ chmod -R 755 $VHOST_MANAGER_DIR
 echo "vhost-admin     ALL = (root) NOPASSWD: /usr/local/bin/vhost" >> /etc/sudoers
 
 # Git add global safe directory
-git config --global --add safe.directory /opt/vhost-manager
+git config --global --add safe.directory $VHOST_MANAGER_DIR
 
 # Let users automatically run vhost-manager with sudo
 echo "alias vhost=\"sudo vhost\"" >> /etc/bash.bashrc
