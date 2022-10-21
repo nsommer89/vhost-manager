@@ -15,16 +15,16 @@
 
 Remember when running the bash-install script to be sudo root, and also as mentioned use a fresh server!
 1. Update and install utillities:<br/>`apt-get update -y && apt-get install -y --no-install-recommends nano curl ca-certificates`
-2. Download vhost-manager installation script:<br/>`curl -O https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/bash-install-full.sh`
-3. Install it:<br/>`bash bash-install-full.sh`
+2. Download vhost-manager installation script:<br/>`curl -O https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/bash-install.sh`
+3. Install it:<br/>`bash bash-install.sh`
 4. Try it out `vhost` or `vhost <some-command>`
 -----
 ## Run in a docker Ubuntu container (for testing purpose)
 1. Pull Docker Ubuntu 22.04:<br />`docker pull ubuntu:22.04`
 2. Start a ubuntu docker container:<br/>`docker run -p 80:80 -p 443:443 -p 22:22 -a stdin -a stdout -i -t ubuntu:22.04 /bin/bash`
 3. When inside the container run<br/>`apt-get update -y && apt-get install -y --no-install-recommends nano curl ca-certificates`
-4. Download vhost-manager installation script:<br/>`curl -O https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/bash-install-full.sh`
-5. Install it:<br/>`bash bash-install-full.sh`
+4. Download vhost-manager installation script:<br/>`curl -O https://raw.githubusercontent.com/nsommer89/vhost-manager/master/update-install/bash-install.sh`
+5. Install it:<br/>`bash bash-install.sh`
 
 ## Run in Docker Compose
 1. Copy the env.dist file `cp app/.env.dist app/.env` and fill out the values

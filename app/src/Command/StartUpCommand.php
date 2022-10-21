@@ -26,14 +26,6 @@ class StartUpCommand extends Command
 
         hook_brand($this->getApplication()->getName(), getenv('VHOST_MANAGER_VERSION'), getenv('LOCALE'));
 
-        try {
-            $db = DatabaseConnection::getInstance();
-        } catch (\Exception $e) {
-            $io->error($e->getMessage() . ' ' . __('Please check your database connection settings.'));
-            echo json_encode($e->getTrace());
-            return Command::FAILURE;
-        }
-
         $io->text(__('Commands'));
         $io->definitionList(
             '<fg=white;bg=blue;>'.__('Virtual Hosts').'</>',

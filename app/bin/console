@@ -7,6 +7,14 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use App\Command;
+use App\Lib\DatabaseConnection;
+
+try {
+    $db = DatabaseConnection::getInstance();
+} catch (\Exception $e) {
+    echo 'Please check your database connection settings.' . PHP_EOL;
+    echo json_encode($e->getTrace()) . PHP_EOL;
+}
 
 $finder = new Finder();
 $finder->files()->in(__DIR__.'/../src/*')->name('*.php');

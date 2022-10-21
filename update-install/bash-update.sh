@@ -2,6 +2,7 @@
 
 VHOST_MANAGER_VERSION=$1
 VHOST_MANAGER_DIR=$2
+COMPOSER_INSTALL_PATH=$3
 
 if [ -z "$VHOST_MANAGER_DIR" ]; then
   echo "Invalid VHOST_MANAGER_DIR. Aborting."
@@ -13,12 +14,17 @@ if [ -z "$VHOST_MANAGER_VERSION" ]; then
   exit 1
 fi
 
+if [ -z "$COMPOSER_INSTALL_PATH" ]; then
+  echo "Invalid COMPOSER_INSTALL_PATH. Aborting."
+  exit 1
+fi
+
 # Git pull
 cd $VHOST_MANAGER_DIR && git pull &> /dev/null && cd /
 echo "Git pull... Done!"
 
 # Run composer install with php8.1 in vhost-manager app directory
-cd $VHOST_MANAGER_DIR/app && /usr/bin/php8.1 /usr/local/bin/composer install && cd /
+cd $VHOST_MANAGER_DIR/app && /usr/bin/php8.1 $COMPOSER_INSTALL_PATH/composer install && cd /
 echo "Composer install... Done!"
 
 # Migrations
@@ -47,4 +53,4 @@ sed -i "s/VHOST_MANAGER_VERSION=.*/VHOST_MANAGER_VERSION=$VHOST_MANAGER_VERSION/
 # restart php8.1-fpm
 systemctl restart php8.1-fpm
 
-exit
+exit 0
